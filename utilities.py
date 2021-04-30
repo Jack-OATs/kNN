@@ -46,7 +46,6 @@ def parse_csv(file_path):
 
 def k_folds(dataset, k):
     full_data = list(zip(dataset[0], dataset[1]))
-    # size_of_fold = int(len(dataset)/k)
     shuffle(full_data)
     folds = np.array_split(full_data, k)
     final_fold = []

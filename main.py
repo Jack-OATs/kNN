@@ -17,7 +17,7 @@ def run_knn():
             predictions = knn_algo.classify(train_features, test_classes, test)
             predictions_list.append(predictions)
         ocm = OutcomeMetrics(predictions_list, train_classes)
-        # print("predictions list is {}\nactual list is {}\n".format(predictions_list, train_classes))
+        print("predictions list is {}\nactual list is {}\n".format(predictions_list, train_classes))
         accuracies.append(ocm.accuracy())
     print("average of accuracy on classification = " + str(np.average(accuracies)))
 
