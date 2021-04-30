@@ -1,6 +1,59 @@
 import math
 import numpy as np
 
+class OutcomeMetrics:
+    def __init__(self, classifier_labels, actual_labels):
+        self.classifier_labels = classifier_labels
+        self.actual_labels = actual_labels
+        self.confusion_matrix = self.__build_confusion_matrix()
+
+    def __build_confusion_matrix(self):
+        # format should be [[true_positive, false_negative], [false_positive, true_negative]]
+        all_labels = zip(self.classifier_labels, self.actual_labels)
+        con_matrix = [[0, 0], [0, 0]]
+        for cl, al in all_labels:
+            if cl == al == 1:
+                con_matrix[0][0] += 1
+            elif cl == al == 0:
+                con_matrix[1][1] += 1
+            elif cl == 1 != al:
+                con_matrix[1][0] += 1
+            elif cl == 0 != al:
+                con_matrix[0][1] += 1
+        return con_matrix
+
+    def get_confusion_matrix(self):
+        return self.confusion_matrix
+
+    def precision(self):
+        # precision is measured as: true_positive/ (true_positive + false_positive)
+        con_mat = self.get_confusion_matrix()
+        tp = con_mat[0][0]
+        fp = con_mat[1][0]
+        if tp + fp == 0:
+            return 0
+        return tp / (tp + fp)
+
+    def recall(self):
+        # recall is measured as: true_positive/ (true_positive + false_negative)
+        con_mat = self.get_confusion_matrix()
+        tp = con_mat[0][0]
+        fn = con_mat[0][1]
+        if tp + fn == 0:
+            return 0
+        return tp / (tp + fn)
+
+    def accuracy(self):
+        # accuracy is measured as:  correct_classifications / total_number_examples
+        con_mat = self.get_confusion_matrix()
+        tp = con_mat[0][0]
+        tn = con_mat[1][1]
+        total = math.fsum(con_mat[0]) + math.fsum(con_mat[1])
+        if total == 0:
+            return 0
+        return (tp + tn) / total
+
+
 def euclidean(all_x, all_y):
     all_points = zip(all_x, all_y)
     set_diff = []
@@ -9,46 +62,34 @@ def euclidean(all_x, all_y):
     return math.sqrt(math.fsum(set_diff))
 
 
-def nearest_neighbor(train_data, test_data, num_of_neighbor):
+def nearest_neighbor(train_features, test_classes, test_features, depth):
         dist_list = []
-        for row in train_data:
-            dist = euclidean(row, test_data)
-            dist_list.append((dist, test_data))
+        fc_test = zip(test_classes, train_features)
+        for cl, row in fc_test:
+            dist = euclidean(row, test_features)
+            # print("dist is {}".format(dist))
+            dist_list.append((dist, test_features, cl))
         dist_list.sort(key=lambda d: d[0])
         neighbor = []
-        for i in range(num_of_neighbor):
-            neighbor.append(dist_list[i][1])
+        for i in range(depth):
+            neighbor.append((dist_list[i][1], dist_list[i][2]))
         return neighbor
 
 
-def classify(train_data, test_data, num_of_neighbor):
-    neighbors = nearest_neighbor(train_data, test_data, num_of_neighbor)
-    class_vals = [neighbor[-1] for neighbor in neighbors]
-    pred = [lambda vals: max(vals, key=vals.count),
-            lambda vals: np.average(vals)]
-    preds = []
-    for p in pred:
-        preds.append(p(class_vals))
-    return preds
+def classify(train_features, test_classes, test_features, depth=5):
+    neighbors = nearest_neighbor(train_features, test_classes, test_features, depth)
+    class_vals = [cl for _, cl in neighbors]
+    # print("neighbors are {}".format(neighbors))
+    # print("classes are {}\n".format(class_vals))
+    pred = max(class_vals, key=class_vals.count)
+    # print("pred is {}".format(pred))
+    return pred
 
 
-def get_example():
-    return [[2.7810836,2.550537003,0],
-        [1.465489372,2.362125076,0],
-        [3.396561688,4.400293529,0],
-        [1.38807019,1.850220317,0],
-        [3.06407232,3.005305973,0],
-        [7.627531214,2.759262235,1],
-        [5.332441248,2.088626775,1],
-        [6.922596716,1.77106367,1],
-        [8.675418651,-0.242068655,1],
-        [7.673756466,3.508563011,1]]
-
-
-if __name__ == '__main__':
-    # n = nearest_neighbor(get_example(), get_example()[0], 3)
-    # for i in n:
-    #     print(i)
-    for example in get_example():
-        pred = classify(get_example(), example, 3)
-        print("pred is {}".format(pred))
+# if __name__ == '__main__':
+#     # n = nearest_neighbor(get_example(), get_example()[0], 3)
+#     # for i in n:
+#     #     print(i)
+#     for example in get_example():
+#         pred = classify(get_example(), example, 6)
+#         print("pred is {}".format(pred))
