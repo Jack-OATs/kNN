@@ -62,34 +62,21 @@ def euclidean(all_x, all_y):
     return math.sqrt(math.fsum(set_diff))
 
 
-def nearest_neighbor(train_features, test_classes, test_features, depth):
+def nearest_neighbor(train_features, train_classes, test_features, depth):
         dist_list = []
-        fc_test = zip(test_classes, train_features)
+        fc_test = zip(train_classes, train_features)
         for cl, row in fc_test:
             dist = euclidean(row, test_features)
-            # print("dist is {}".format(dist))
             dist_list.append((dist, test_features, cl))
         dist_list.sort(key=lambda d: d[0])
         neighbor = []
         for i in range(depth):
-            neighbor.append((dist_list[i][1], dist_list[i][2]))
+            neighbor.append(dist_list[i][2])#, dist_list[i][2]))
         return neighbor
 
 
-def classify(train_features, test_classes, test_features, depth=5):
-    neighbors = nearest_neighbor(train_features, test_classes, test_features, depth)
-    class_vals = [cl for _, cl in neighbors]
-    # print("neighbors are {}".format(neighbors))
-    # print("classes are {}\n".format(class_vals))
+def classify(train_features, train_classes, test_features, depth=30):
+    neighbors = nearest_neighbor(train_features, train_classes, test_features, depth)
+    class_vals = [cl for cl in neighbors]
     pred = max(class_vals, key=class_vals.count)
-    # print("pred is {}".format(pred))
     return pred
-
-
-# if __name__ == '__main__':
-#     # n = nearest_neighbor(get_example(), get_example()[0], 3)
-#     # for i in n:
-#     #     print(i)
-#     for example in get_example():
-#         pred = classify(get_example(), example, 6)
-#         print("pred is {}".format(pred))
