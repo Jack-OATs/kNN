@@ -12,12 +12,13 @@ def run_knn():
     for fold in folds:
         train_data, test_data = fold
         train_features, train_classes = train_data
+        # fc_train = zip(train_features, train_classes)
         test_features, test_classes = test_data
         for test in test_features:
-            predictions = knn_algo.classify(train_features, test_classes, test)
+            predictions = knn_algo.classify(train_features, train_classes, test)
             predictions_list.append(predictions)
         ocm = OutcomeMetrics(predictions_list, train_classes)
-        print("predictions list is {}\nactual list is {}\n".format(predictions_list, train_classes))
+        # print("predictions list is {}\nactual list is {}\n".format(predictions_list, train_classes))
         accuracies.append(ocm.accuracy())
     print("average of accuracy on classification = " + str(np.average(accuracies)))
 
