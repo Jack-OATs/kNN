@@ -1,6 +1,7 @@
 import numpy as np
 from random import shuffle
 
+
 def str_to_float(data, index):
     for row in data:
         row[index] = float(row[index].strip())
@@ -31,8 +32,7 @@ def load_csv(file_path):
         data.append(sub_data)
     for i in range(len(data[0])-1):
         str_to_float(data, i)
-    lk = str_to_int(data, len(data[0])-1)
-    # print("data now looks like {} and dictionary is {}".format(data[0], lk))
+    # lk = str_to_int(data, len(data[0])-1)
     return data
 
 
@@ -40,7 +40,6 @@ def parse_csv(file_path):
     data = load_csv(file_path)
     features = [row[:-1] for row in data]
     classes = [row[-1] for row in data]
-    # print('features are {} and classes are {}'.format(features, classes))
     return features, classes
 
 
@@ -65,8 +64,3 @@ def k_folds(dataset, k):
             testing_classes.append(item[1])
         final_fold.append(((training_features, training_classes), (testing_examples, testing_classes)))
     return final_fold
-
-
-
-if __name__ == '__main__':
-    parse_csv("Iris_Flower_Species.csv")
